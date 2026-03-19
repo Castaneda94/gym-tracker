@@ -6,20 +6,19 @@
     <title>Consistency Coach</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Apple-style system font stack */
         body { 
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: #F2F2F7; /* Standard iOS Grouped Background */
+            background-color: #F2F2F7;
             -webkit-tap-highlight-color: transparent; 
+            color: #102132;
         }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         
-        /* Custom toggle styling for that Apple look */
         .apple-checkbox {
             appearance: none;
-            width: 26px;
-            height: 26px;
-            border: 2px solid #D1D1D6;
+            width: 24px;
+            height: 24px;
+            border: 1.5px solid #D1D1D6;
             border-radius: 50%;
             background-color: #fff;
             display: inline-grid;
@@ -28,152 +27,124 @@
             cursor: pointer;
         }
         .apple-checkbox:checked {
-            background-color: #102132; /* Navy Blue */
+            background-color: #102132;
             border-color: #102132;
         }
         .apple-checkbox:checked::after {
             content: "✓";
             color: white;
-            font-size: 14px;
+            font-size: 12px;
             font-weight: bold;
         }
 
-        /* Calendar dot indicators */
-        .dot-gym { background-color: #102132; } /* Navy Blue */
-        .dot-walk { background-color: #34C759; }
-        .dot-rest { background-color: #8E8E93; }
+        .progress-ring {
+            transition: stroke-dashoffset 0.35s;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
     </style>
 </head>
-<body class="text-[#102132] antialiased pb-20">
+<body class="antialiased pb-24">
 
-    <!-- Header Area -->
-    <header class="pt-12 pb-6 px-6 bg-white/80 backdrop-blur-md sticky top-0 z-10 border-b border-gray-200">
-        <h1 class="text-3xl font-extrabold tracking-tight text-[#102132]">So you came back for more</h1>
+    <!-- Header Area with Progress Ring -->
+    <header class="pt-12 pb-6 px-6 bg-white/80 backdrop-blur-xl sticky top-0 z-20 border-b border-gray-200">
+        <div class="flex justify-between items-start">
+            <div>
+                <p id="timeGreeting" class="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1">Current Focus</p>
+                <h1 id="mainTitle" class="text-2xl font-extrabold tracking-tight leading-tight">So you came back for more</h1>
+            </div>
+            <!-- Progress Circle -->
+            <div class="relative flex items-center justify-center">
+                <svg width="60" height="60">
+                    <circle stroke="#E5E7EB" stroke-width="4" fill="transparent" r="24" cx="30" cy="30"/>
+                    <circle id="progressCircle" stroke="#102132" stroke-width="4" stroke-dasharray="150.8" stroke-dashoffset="150.8" stroke-linecap="round" fill="transparent" r="24" cx="30" cy="30" class="progress-ring"/>
+                </svg>
+                <span id="progressText" class="absolute text-[10px] font-bold">0%</span>
+            </div>
+        </div>
+        
         <div class="mt-4 flex items-center justify-between">
-            <p class="text-gray-500 font-medium uppercase text-[10px] tracking-widest">Today's Progress</p>
             <div class="flex items-center space-x-2">
                 <span class="text-[10px] text-gray-400 font-bold uppercase tracking-tight">Streak</span>
-                <span id="streakDisplay" class="bg-[#102132] text-white px-3 py-0.5 rounded-full text-xs font-bold shadow-sm">0 Days</span>
+                <span id="streakDisplay" class="bg-[#102132] text-white px-3 py-0.5 rounded-full text-xs font-bold">0 Days</span>
             </div>
+            <span id="currentDate" class="text-[10px] font-bold text-gray-400 uppercase"></span>
         </div>
     </header>
 
-    <main class="mt-6 px-5 space-y-8">
+    <main class="mt-6 px-5 space-y-6">
 
-        <!-- The Transition: High Focus Action -->
-        <section>
-            <h2 class="text-[11px] font-semibold text-gray-500 uppercase tracking-widest mb-3 ml-1">Daily Commitment</h2>
-            <div class="bg-white rounded-[20px] p-6 shadow-[0_2px_12px_rgba(0,0,0,0.04)] border border-gray-100">
+        <!-- The Transition: 6:15 PM Bridge -->
+        <section id="bridgeSection">
+            <h2 class="text-[11px] font-semibold text-gray-400 uppercase tracking-widest mb-2 ml-1">The 6:15 PM Bridge</h2>
+            <div class="bg-white rounded-[24px] p-5 shadow-sm border border-gray-100">
                 <div class="flex items-center space-x-3 mb-5">
-                    <div class="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center text-xl">🚀</div>
+                    <div id="statusIcon" class="w-10 h-10 bg-slate-100 rounded-2xl flex items-center justify-center text-xl shadow-inner">🚀</div>
                     <div>
-                        <h3 class="font-bold text-lg leading-tight text-[#102132]">The 6:15 PM Bridge</h3>
-                        <p class="text-xs text-gray-500">Immediate transition. No home stops.</p>
+                        <h3 id="statusHeading" class="font-bold text-base leading-tight">Ready to Move?</h3>
+                        <p id="statusSubheading" class="text-[11px] text-gray-500">Go straight to the gym after 6 PM.</p>
                     </div>
                 </div>
                 
-                <div id="actionButtons" class="space-y-3">
-                    <button onclick="logActivity('Gym')" class="w-full bg-[#102132] text-white py-4 rounded-2xl font-semibold active:opacity-70 transition-opacity flex justify-between px-5 items-center">
-                        <span>Gym Workout</span>
-                        <span class="text-[9px] opacity-40 font-black uppercase tracking-tighter">M · Th · F</span>
+                <div class="grid grid-cols-1 gap-3">
+                    <button onclick="logActivity('Gym')" class="w-full bg-[#102132] text-white py-4 rounded-2xl font-bold active:scale-[0.98] transition-all flex justify-between px-6 items-center shadow-lg shadow-blue-900/10">
+                        <span>Log Workout</span>
+                        <span class="text-[9px] opacity-40 font-black uppercase tracking-widest">M · Th · F</span>
                     </button>
-                    <button onclick="logActivity('Walk')" class="w-full bg-white text-[#102132] py-4 rounded-2xl font-semibold active:bg-gray-50 transition-colors border border-gray-200 flex justify-between px-5 items-center">
-                        <span>Active Rest (Walk)</span>
-                        <span class="text-[9px] text-gray-400 font-black uppercase tracking-tighter">T · Sat</span>
+                    <button onclick="logActivity('Walk')" class="w-full bg-white text-[#102132] py-4 rounded-2xl font-bold active:bg-gray-50 transition-colors border border-gray-200 flex justify-between px-6 items-center">
+                        <span>Log Active Rest</span>
+                        <span class="text-[9px] text-gray-400 font-black uppercase tracking-widest">T · Sat</span>
                     </button>
                 </div>
-                <p id="feedback" class="text-center mt-4 text-xs font-medium text-[#102132] hidden"></p>
+                <p id="feedback" class="text-center mt-4 text-[11px] font-bold text-[#102132] hidden">Session Recorded</p>
             </div>
         </section>
 
-        <!-- Nutrition: Apple Settings Style List -->
+        <!-- Nutrition: Target Tracking -->
         <section>
-            <h2 class="text-[11px] font-semibold text-gray-500 uppercase tracking-widest mb-3 ml-1">Nutrition Strategy</h2>
-            <div class="bg-white rounded-[20px] overflow-hidden shadow-[0_2px_12px_rgba(0,0,0,0.04)] border border-gray-100">
-                <div class="flex items-center justify-between p-4 border-b border-gray-100">
-                    <span class="font-medium text-sm">High Protein Lunch</span>
-                    <input type="checkbox" id="checkProtein" onchange="saveNutrition()" class="apple-checkbox">
-                </div>
-                <div class="flex items-center justify-between p-4 border-b border-gray-100">
-                    <span class="font-medium text-sm">Pre-Gym Snack (5 PM)</span>
-                    <input type="checkbox" id="checkSnack" onchange="saveNutrition()" class="apple-checkbox">
+            <h2 class="text-[11px] font-semibold text-gray-400 uppercase tracking-widest mb-2 ml-1">Nutrition Strategy</h2>
+            <div class="bg-white rounded-[24px] overflow-hidden shadow-sm border border-gray-100 divide-y divide-gray-50">
+                <div class="flex items-center justify-between p-4">
+                    <div class="flex flex-col">
+                        <span class="font-bold text-sm tracking-tight">High Protein Lunch</span>
+                        <span class="text-[10px] text-gray-400 uppercase font-bold tracking-tighter">Front-load protein</span>
+                    </div>
+                    <input type="checkbox" id="checkProtein" onchange="updateProgress()" class="apple-checkbox daily-task">
                 </div>
                 <div class="flex items-center justify-between p-4">
-                    <span class="font-medium text-sm">Caloric Deficit Maintained</span>
-                    <input type="checkbox" id="checkDeficit" onchange="saveNutrition()" class="apple-checkbox">
+                    <div class="flex flex-col">
+                        <span class="font-bold text-sm tracking-tight">5 PM Bridge Snack</span>
+                        <span class="text-[10px] text-gray-400 uppercase font-bold tracking-tighter">Crucial energy</span>
+                    </div>
+                    <input type="checkbox" id="checkSnack" onchange="updateProgress()" class="apple-checkbox daily-task">
+                </div>
+                <div class="flex items-center justify-between p-4">
+                    <div class="flex flex-col">
+                        <span class="font-bold text-sm tracking-tight">Caloric Deficit</span>
+                        <span class="text-[10px] text-gray-400 uppercase font-bold tracking-tighter">Big dinner limited?</span>
+                    </div>
+                    <input type="checkbox" id="checkDeficit" onchange="updateProgress()" class="apple-checkbox daily-task">
+                </div>
+                <div class="flex items-center justify-between p-4 bg-slate-50/50">
+                    <div class="flex flex-col">
+                        <span class="font-bold text-sm tracking-tight text-gray-400">Gym Bag Packed</span>
+                        <span class="text-[10px] text-gray-400 uppercase font-bold tracking-tighter">Prepare for tomorrow</span>
+                    </div>
+                    <input type="checkbox" id="checkBag" onchange="updateProgress()" class="apple-checkbox daily-task">
                 </div>
             </div>
         </section>
 
-        <!-- Calendar Reference (Apple Calendar Style) -->
+        <!-- Weekly Reference -->
         <section>
-            <h2 class="text-[11px] font-semibold text-gray-500 uppercase tracking-widest mb-3 ml-1">Weekly Blueprint</h2>
-            <div class="bg-white rounded-[20px] overflow-hidden shadow-[0_2px_12px_rgba(0,0,0,0.04)] border border-gray-100">
-                <!-- Mon -->
-                <div class="flex items-center p-4 border-b border-gray-50">
-                    <div class="w-12 flex flex-col items-center border-r border-gray-100 mr-4">
-                        <span class="text-[10px] text-red-500 font-bold uppercase tracking-tighter">Mon</span>
-                    </div>
-                    <div class="flex-1 flex items-center">
-                        <div class="w-2 h-2 rounded-full dot-gym mr-3"></div>
-                        <span class="text-sm font-semibold">Gym Session</span>
-                    </div>
-                </div>
-                <!-- Tue -->
-                <div class="flex items-center p-4 border-b border-gray-50">
-                    <div class="w-12 flex flex-col items-center border-r border-gray-100 mr-4">
-                        <span class="text-[10px] text-gray-400 font-bold uppercase tracking-tighter">Tue</span>
-                    </div>
-                    <div class="flex-1 flex items-center">
-                        <div class="w-2 h-2 rounded-full dot-walk mr-3"></div>
-                        <span class="text-sm font-semibold text-gray-700">Active Rest</span>
-                    </div>
-                </div>
-                <!-- Wed -->
-                <div class="flex items-center p-4 border-b border-gray-50">
-                    <div class="w-12 flex flex-col items-center border-r border-gray-100 mr-4">
-                        <span class="text-[10px] text-[#007AFF] font-bold uppercase tracking-tighter">Wed</span>
-                    </div>
-                    <div class="flex-1 flex items-center">
-                        <div class="w-2 h-2 rounded-full dot-rest mr-3"></div>
-                        <span class="text-sm font-medium text-gray-400 italic">Meeting</span>
-                    </div>
-                </div>
-                <!-- Thu -->
-                <div class="flex items-center p-4 border-b border-gray-50">
-                    <div class="w-12 flex flex-col items-center border-r border-gray-100 mr-4">
-                        <span class="text-[10px] text-[#102132] font-bold uppercase tracking-tighter">Thu</span>
-                    </div>
-                    <div class="flex-1 flex items-center">
-                        <div class="w-2 h-2 rounded-full dot-gym mr-3"></div>
-                        <span class="text-sm font-semibold text-gray-700">Gym Session</span>
-                    </div>
-                </div>
-                <!-- Fri -->
-                <div class="flex items-center p-4 border-b border-gray-50">
-                    <div class="w-12 flex flex-col items-center border-r border-gray-100 mr-4">
-                        <span class="text-[10px] text-[#102132] font-bold uppercase tracking-tighter">Fri</span>
-                    </div>
-                    <div class="flex-1 flex items-center">
-                        <div class="w-2 h-2 rounded-full dot-gym mr-3"></div>
-                        <span class="text-sm font-semibold text-gray-700">Gym Session</span>
-                    </div>
-                </div>
-                <!-- Sat -->
-                <div class="flex items-center p-4">
-                    <div class="w-12 flex flex-col items-center border-r border-gray-100 mr-4">
-                        <span class="text-[10px] text-gray-400 font-bold uppercase tracking-tighter">Sat</span>
-                    </div>
-                    <div class="flex-1 flex items-center">
-                        <div class="w-2 h-2 rounded-full dot-walk mr-3"></div>
-                        <span class="text-sm font-semibold text-gray-700">Active Rest</span>
-                    </div>
-                </div>
+            <h2 class="text-[11px] font-semibold text-gray-400 uppercase tracking-widest mb-2 ml-1">Weekly Blueprint</h2>
+            <div class="bg-white rounded-[24px] overflow-hidden shadow-sm border border-gray-100">
+                <div id="calendarContent"></div>
             </div>
         </section>
 
-        <div class="flex justify-center pt-8">
-            <button onclick="resetAll()" class="text-gray-400 text-[9px] font-bold uppercase tracking-widest border-b border-gray-300 pb-0.5 active:text-red-500 active:border-red-500 transition-colors">
+        <div class="flex flex-col items-center pt-4 pb-8 space-y-4">
+            <button onclick="resetAll()" class="text-gray-300 text-[10px] font-bold uppercase tracking-widest border-b border-gray-200 pb-0.5 active:text-red-400 transition-colors">
                 Reset All Progress
             </button>
         </div>
@@ -181,14 +152,106 @@
     </main>
 
     <script>
+        const days = [
+            { day: 'Mon', activity: 'Gym Session', color: '#102132' },
+            { day: 'Tue', activity: 'Active Rest', color: '#34C759' },
+            { day: 'Wed', activity: 'Meeting', color: '#8E8E93', italic: true },
+            { day: 'Thu', activity: 'Gym Session', color: '#102132' },
+            { day: 'Fri', activity: 'Gym Session', color: '#102132' },
+            { day: 'Sat', activity: 'Active Rest', color: '#34C759' },
+            { day: 'Sun', activity: 'Off Day', color: '#8E8E93' }
+        ];
+
         document.addEventListener('DOMContentLoaded', () => {
+            initApp();
+            renderCalendar();
+            updateContext();
+            setInterval(updateContext, 60000); // Check every minute
+        });
+
+        function initApp() {
             const streak = localStorage.getItem('streak') || 0;
             document.getElementById('streakDisplay').innerText = streak + ' Days';
             
-            document.getElementById('checkProtein').checked = localStorage.getItem('protein') === 'true';
-            document.getElementById('checkSnack').checked = localStorage.getItem('snack') === 'true';
-            document.getElementById('checkDeficit').checked = localStorage.getItem('deficit') === 'true';
-        });
+            // Load saved task states
+            const tasks = ['protein', 'snack', 'deficit', 'bag'];
+            tasks.forEach(task => {
+                const element = document.getElementById('check' + task.charAt(0).toUpperCase() + task.slice(1));
+                if (element) element.checked = localStorage.getItem(task) === 'true';
+            });
+
+            document.getElementById('currentDate').innerText = new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+            updateProgress();
+        }
+
+        function updateContext() {
+            const now = new Date();
+            const hour = now.getHours();
+            const greeting = document.getElementById('timeGreeting');
+            const title = document.getElementById('mainTitle');
+            const statusH = document.getElementById('statusHeading');
+            const statusS = document.getElementById('statusSubheading');
+            const icon = document.getElementById('statusIcon');
+
+            if (hour >= 16 && hour < 18) {
+                greeting.innerText = "5 PM Transition";
+                title.innerText = "Eat your snack now";
+                statusH.innerText = "Fuel Up";
+                statusS.innerText = "Protein snack now for gym energy.";
+                icon.innerText = "🍎";
+            } else if (hour >= 18 && hour < 20) {
+                greeting.innerText = "6:15 PM Bridge";
+                title.innerText = "Straight to the Gym";
+                statusH.innerText = "Momentum is Key";
+                statusS.innerText = "Do not stop at home. Go now.";
+                icon.innerText = "🏋️‍♂️";
+            } else {
+                greeting.innerText = "Current Focus";
+                title.innerText = "So you came back for more";
+                statusH.innerText = "Ready to Move?";
+                statusS.innerText = "Immediate transition. No home stops.";
+                icon.innerText = "🚀";
+            }
+        }
+
+        function renderCalendar() {
+            const container = document.getElementById('calendarContent');
+            const currentDayIndex = (new Date().getDay() + 6) % 7; // Adjust to Monday start
+
+            container.innerHTML = days.map((d, index) => `
+                <div class="flex items-center p-4 ${index < days.length - 1 ? 'border-b border-gray-50' : ''} ${index === currentDayIndex ? 'bg-blue-50/30' : ''}">
+                    <div class="w-12 flex flex-col items-center border-r border-gray-100 mr-4">
+                        <span class="text-[10px] ${index === 0 ? 'text-red-500' : index === 2 ? 'text-blue-500' : 'text-gray-400'} font-bold uppercase tracking-tighter">${d.day}</span>
+                    </div>
+                    <div class="flex-1 flex items-center">
+                        <div class="w-2.5 h-2.5 rounded-full mr-3 shadow-sm" style="background-color: ${d.color}"></div>
+                        <span class="text-sm font-semibold ${d.italic ? 'italic text-gray-400 font-medium' : 'text-gray-700'}">${d.activity}</span>
+                    </div>
+                    ${index === currentDayIndex ? '<span class="text-[8px] font-bold text-blue-500 uppercase tracking-widest">Today</span>' : ''}
+                </div>
+            `).join('');
+        }
+
+        function updateProgress() {
+            const totalTasks = document.querySelectorAll('.daily-task').length;
+            const completedTasks = document.querySelectorAll('.daily-task:checked').length;
+            const percentage = Math.round((completedTasks / totalTasks) * 100);
+            
+            // Update Circle
+            const circle = document.getElementById('progressCircle');
+            const radius = circle.r.baseVal.value;
+            const circumference = radius * 2 * Math.PI;
+            const offset = circumference - (percentage / 100) * circumference;
+            circle.style.strokeDashoffset = offset;
+            
+            document.getElementById('progressText').innerText = percentage + '%';
+
+            // Save state
+            localStorage.setItem('protein', document.getElementById('checkProtein').checked);
+            localStorage.setItem('snack', document.getElementById('checkSnack').checked);
+            localStorage.setItem('deficit', document.getElementById('checkDeficit').checked);
+            localStorage.setItem('bag', document.getElementById('checkBag').checked);
+        }
 
         function logActivity(type) {
             let streak = parseInt(localStorage.getItem('streak') || 0);
@@ -197,16 +260,15 @@
             document.getElementById('streakDisplay').innerText = streak + ' Days';
             
             const feedback = document.getElementById('feedback');
-            feedback.innerText = "Entry logged successfully";
+            feedback.innerText = type + " Logged 🔥";
             feedback.classList.remove('hidden');
             
+            // Add slight vibration/haptic feel if on mobile
+            if (window.navigator && window.navigator.vibrate) {
+                window.navigator.vibrate(10);
+            }
+            
             setTimeout(() => feedback.classList.add('hidden'), 2500);
-        }
-
-        function saveNutrition() {
-            localStorage.setItem('protein', document.getElementById('checkProtein').checked);
-            localStorage.setItem('snack', document.getElementById('checkSnack').checked);
-            localStorage.setItem('deficit', document.getElementById('checkDeficit').checked);
         }
 
         function resetAll() {
