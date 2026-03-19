@@ -103,19 +103,19 @@
                 <div class="flex items-center space-x-4 mb-6">
                     <div id="statusIcon" class="w-12 h-12 bg-gray-50 rounded-2xl flex items-center justify-center text-2xl shadow-inner border border-gray-100">🚀</div>
                     <div>
-                        <h3 id="statusHeading" class="font-bold text-lg leading-tight tracking-tight">Lets go</h3>
+                        <h3 id="statusHeading" class="font-bold text-lg leading-tight tracking-tight text-[#102132]">Lets go</h3>
                         <p id="statusSubheading" class="text-[12px] text-gray-500">Go straight to the gym after 6 PM.</p>
                     </div>
                 </div>
                 
-                <div class="grid grid-cols-1 gap-3">
-                    <button id="gymBtn" onclick="logActivity('Gym')" class="w-full bg-[#102132] text-white py-4.5 rounded-[18px] font-bold active:scale-[0.97] transition-all flex justify-between px-6 items-center shadow-lg shadow-blue-900/10">
-                        <span id="gymLabel">Log Workout</span>
-                        <span class="text-[9px] opacity-40 font-black uppercase tracking-widest">M · Th · F</span>
+                <div class="grid grid-cols-1 gap-4">
+                    <button id="gymBtn" onclick="logActivity('Gym')" class="w-full bg-white text-[#102132] py-5 rounded-[22px] font-extrabold active:bg-gray-50 transition-all border-2 border-[#102132] flex justify-between px-6 items-center shadow-sm">
+                        <span id="gymLabel" class="text-lg">Log Workout</span>
+                        <span class="text-[10px] text-gray-400 font-black uppercase tracking-widest">M · Th · F</span>
                     </button>
-                    <button id="walkBtn" onclick="logActivity('Walk')" class="w-full bg-white text-[#102132] py-4.5 rounded-[18px] font-bold active:bg-gray-50 transition-colors border border-gray-200 flex justify-between px-6 items-center">
-                        <span id="walkLabel">Log Active Rest</span>
-                        <span class="text-[9px] text-gray-400 font-black uppercase tracking-widest">T · Sat</span>
+                    <button id="walkBtn" onclick="logActivity('Walk')" class="w-full bg-white text-[#102132] py-5 rounded-[22px] font-extrabold active:bg-gray-50 transition-all border-2 border-[#102132] flex justify-between px-6 items-center shadow-sm">
+                        <span id="walkLabel" class="text-lg">Log Active Rest</span>
+                        <span class="text-[10px] text-gray-400 font-black uppercase tracking-widest">T · Sat</span>
                     </button>
                 </div>
                 <p id="feedback" class="text-center mt-4 text-[11px] font-bold text-[#102132] opacity-0 transition-opacity">Session Recorded</p>
@@ -128,14 +128,14 @@
             <div class="bg-white rounded-[28px] overflow-hidden shadow-sm border border-gray-100 divide-y divide-gray-50">
                 <div class="flex items-center justify-between p-5 active:bg-gray-50 transition-colors" onclick="toggleCheck('checkProtein')">
                     <div class="flex flex-col">
-                        <span class="font-bold text-[15px] tracking-tight">High Protein Lunch</span>
+                        <span class="font-bold text-[15px] tracking-tight text-[#102132]">High Protein Lunch</span>
                         <span class="text-[10px] text-gray-400 uppercase font-bold tracking-widest mt-0.5">Front-load protein</span>
                     </div>
                     <input type="checkbox" id="checkProtein" onchange="handleTaskChange()" class="apple-checkbox daily-task" onclick="event.stopPropagation()">
                 </div>
                 <div class="flex items-center justify-between p-5 active:bg-gray-50 transition-colors" onclick="toggleCheck('checkSnack')">
                     <div class="flex flex-col">
-                        <span class="font-bold text-[15px] tracking-tight">5 PM Bridge Snack</span>
+                        <span class="font-bold text-[15px] tracking-tight text-[#102132]">5 PM Bridge Snack</span>
                         <span class="text-[10px] text-gray-400 uppercase font-bold tracking-widest mt-0.5">Critical energy</span>
                     </div>
                     <input type="checkbox" id="checkSnack" onchange="handleTaskChange()" class="apple-checkbox daily-task" onclick="event.stopPropagation()">
@@ -315,11 +315,14 @@
 
             if (type === 'Gym') {
                 gymBtn.innerHTML = '<span>Workout Logged ✓</span><span class="text-[10px]">🔥</span>';
-                gymBtn.classList.replace('bg-[#102132]', 'bg-emerald-600');
+                gymBtn.classList.replace('bg-white', 'bg-emerald-600');
+                gymBtn.classList.replace('text-[#102132]', 'text-white');
+                gymBtn.classList.replace('border-[#102132]', 'border-emerald-600');
             } else {
                 walkBtn.innerHTML = '<span>Active Rest Logged ✓</span><span class="text-[10px]">🌿</span>';
-                walkBtn.classList.replace('bg-white', 'bg-emerald-50');
-                walkBtn.classList.add('border-emerald-200');
+                walkBtn.classList.replace('bg-white', 'bg-emerald-600');
+                walkBtn.classList.replace('text-[#102132]', 'text-white');
+                walkBtn.classList.replace('border-[#102132]', 'border-emerald-600');
             }
         }
 
