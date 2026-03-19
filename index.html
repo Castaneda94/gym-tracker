@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Consistency Coach</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { -webkit-tap-highlight-color: transparent; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900 font-sans pb-20">
+
+    <!-- Header -->
+    <header class="bg-blue-600 text-white p-6 rounded-b-3xl shadow-lg mb-6">
+        <h1 class="text-2xl font-bold">Hey Brother! 👋</h1>
+        <p class="opacity-80">One day at a time.</p>
+        <div class="mt-4 bg-blue-500/30 p-3 rounded-xl flex justify-between items-center">
+            <span class="font-medium">Current Streak:</span>
+            <span id="streakDisplay" class="text-xl font-bold underline">0 Days</span>
+        </div>
+    </header>
+
+    <main class="px-4 space-y-6">
+
+        <!-- Transition Zone: The 6:00 PM Bridge -->
+        <section class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
+            <h2 class="text-lg font-bold mb-3 flex items-center">
+                🚀 The 6:15 PM Bridge
+            </h2>
+            <p class="text-sm text-slate-500 mb-4">Don't go home yet! Go straight to the gym. Your bag is in the car.</p>
+            <div id="actionButtons" class="grid grid-cols-1 gap-3">
+                <button onclick="logActivity('Gym')" class="w-full bg-blue-600 text-white py-4 rounded-xl font-bold active:scale-95 transition-transform shadow-md">
+                    Log Gym Workout (M, Th, F)
+                </button>
+                <button onclick="logActivity('Walk')" class="w-full bg-emerald-500 text-white py-4 rounded-xl font-bold active:scale-95 transition-transform shadow-md">
+                    Log Active Rest (T, Sat)
+                </button>
+            </div>
+            <p id="feedback" class="text-center mt-3 text-sm font-medium text-blue-600 hidden"></p>
+        </section>
+
+        <!-- Nutrition: The Deficit Guide -->
+        <section class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
+            <h2 class="text-lg font-bold mb-3 flex items-center">
+                🥗 Nutrition Check
+            </h2>
+            <div class="space-y-4">
+                <div class="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                    <span>High Protein Lunch?</span>
+                    <input type="checkbox" id="checkProtein" onchange="saveNutrition()" class="w-6 h-6 rounded">
+                </div>
+                <div class="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                    <span>Pre-Gym Snack (5 PM)?</span>
+                    <input type="checkbox" id="checkSnack" onchange="saveNutrition()" class="w-6 h-6 rounded">
+                </div>
+                <div class="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                    <span>Deficit Maintained?</span>
+                    <input type="checkbox" id="checkDeficit" onchange="saveNutrition()" class="w-6 h-6 rounded">
+                </div>
+            </div>
+        </section>
+
+        <!-- Weekly Schedule Reference -->
+        <section class="bg-slate-800 text-white p-5 rounded-2xl shadow-lg">
+            <h2 class="text-lg font-bold mb-3">📅 This Week's Plan</h2>
+            <div class="grid grid-cols-2 gap-2 text-xs">
+                <div class="border-l-2 border-blue-400 pl-2"><strong>MON:</strong> Gym</div>
+                <div class="border-l-2 border-emerald-400 pl-2"><strong>TUE:</strong> Walk</div>
+                <div class="border-l-2 border-slate-500 pl-2 opacity-50"><strong>WED:</strong> Church</div>
+                <div class="border-l-2 border-blue-400 pl-2"><strong>THU:</strong> Gym</div>
+                <div class="border-l-2 border-blue-400 pl-2"><strong>FRI:</strong> Gym</div>
+                <div class="border-l-2 border-emerald-400 pl-2"><strong>SAT:</strong> Walk</div>
+            </div>
+        </section>
+
+        <button onclick="resetAll()" class="w-full text-slate-400 text-xs py-10">Reset Progress</button>
+
+    </main>
+
+    <script>
+        // Load initial state
+        document.addEventListener('DOMContentLoaded', () => {
+            const streak = localStorage.getItem('streak') || 0;
+            document.getElementById('streakDisplay').innerText = streak + ' Days';
+            
+            // Load checkboxes
+            document.getElementById('checkProtein').checked = localStorage.getItem('protein') === 'true';
+            document.getElementById('checkSnack').checked = localStorage.getItem('snack') === 'true';
+            document.getElementById('checkDeficit').checked = localStorage.getItem('deficit') === 'true';
+        });
+
+        function logActivity(type) {
+            let streak = parseInt(localStorage.getItem('streak') || 0);
+            streak++;
+            localStorage.setItem('streak', streak);
+            document.getElementById('streakDisplay').innerText = streak + ' Days';
+            
+            const feedback = document.getElementById('feedback');
+            feedback.innerText = "🔥 Awesome! " + type + " logged.";
+            feedback.classList.remove('hidden');
+            
+            setTimeout(() => feedback.classList.add('hidden'), 3000);
+        }
+
+        function saveNutrition() {
+            localStorage.setItem('protein', document.getElementById('checkProtein').checked);
+            localStorage.setItem('snack', document.getElementById('checkSnack').checked);
+            localStorage.setItem('deficit', document.getElementById('checkDeficit').checked);
+        }
+
+        function resetAll() {
+            if(confirm("Are you sure you want to reset your streak and data?")) {
+                localStorage.clear();
+                window.location.reload();
+            }
+        }
+    </script>
+</body>
+</html>
