@@ -11,140 +11,160 @@
             background-color: #F2F2F7;
             -webkit-tap-highlight-color: transparent; 
             color: #102132;
+            overflow-x: hidden;
         }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
         
         .apple-checkbox {
             appearance: none;
-            width: 24px;
-            height: 24px;
+            width: 26px;
+            height: 26px;
             border: 1.5px solid #D1D1D6;
             border-radius: 50%;
             background-color: #fff;
             display: inline-grid;
             place-content: center;
-            transition: all 0.2s ease;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             cursor: pointer;
         }
         .apple-checkbox:checked {
             background-color: #102132;
             border-color: #102132;
+            transform: scale(1.1);
         }
         .apple-checkbox:checked::after {
             content: "✓";
             color: white;
-            font-size: 12px;
+            font-size: 14px;
             font-weight: bold;
         }
 
         .progress-ring {
-            transition: stroke-dashoffset 0.35s;
+            transition: stroke-dashoffset 0.6s cubic-bezier(0.4, 0, 0.2, 1);
             transform: rotate(-90deg);
             transform-origin: 50% 50%;
+        }
+
+        @keyframes pulse-subtle {
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.02); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        .today-highlight {
+            border: 1px solid rgba(16, 33, 50, 0.15);
+            animation: pulse-subtle 3s infinite ease-in-out;
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
         }
     </style>
 </head>
 <body class="antialiased pb-24">
 
-    <!-- Header Area with Progress Ring -->
-    <header class="pt-12 pb-6 px-6 bg-white/80 backdrop-blur-xl sticky top-0 z-20 border-b border-gray-200">
+    <!-- Audio Feedback (Hidden) -->
+    <audio id="clickSound" src="https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3" preload="auto"></audio>
+    <audio id="completeSound" src="https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3" preload="auto"></audio>
+
+    <!-- Header Area -->
+    <header class="pt-14 pb-6 px-6 glass sticky top-0 z-30 border-b border-gray-200">
         <div class="flex justify-between items-start">
             <div>
-                <p id="timeGreeting" class="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1">Current Focus</p>
-                <h1 id="mainTitle" class="text-2xl font-extrabold tracking-tight leading-tight">So you came back for more</h1>
+                <p id="timeGreeting" class="text-[10px] font-bold uppercase tracking-[0.15em] text-gray-400 mb-1">Current Focus</p>
+                <h1 id="mainTitle" class="text-2xl font-extrabold tracking-tight leading-tight text-gray-900">So you came back for more</h1>
+                <p id="scoreLabel" class="text-[11px] font-medium text-[#102132] mt-1 opacity-60">Starting the day...</p>
             </div>
-            <!-- Progress Circle -->
+            
             <div class="relative flex items-center justify-center">
-                <svg width="60" height="60">
-                    <circle stroke="#E5E7EB" stroke-width="4" fill="transparent" r="24" cx="30" cy="30"/>
-                    <circle id="progressCircle" stroke="#102132" stroke-width="4" stroke-dasharray="150.8" stroke-dashoffset="150.8" stroke-linecap="round" fill="transparent" r="24" cx="30" cy="30" class="progress-ring"/>
+                <svg width="64" height="64" viewBox="0 0 64 64">
+                    <circle stroke="#E5E7EB" stroke-width="4.5" fill="transparent" r="26" cx="32" cy="32"/>
+                    <circle id="progressCircle" stroke="#102132" stroke-width="4.5" stroke-dasharray="163.36" stroke-dashoffset="163.36" stroke-linecap="round" fill="transparent" r="26" cx="32" cy="32" class="progress-ring"/>
                 </svg>
-                <span id="progressText" class="absolute text-[10px] font-bold">0%</span>
+                <span id="progressText" class="absolute text-[11px] font-black tracking-tighter">0%</span>
             </div>
         </div>
         
-        <div class="mt-4 flex items-center justify-between">
-            <div class="flex items-center space-x-2">
-                <span class="text-[10px] text-gray-400 font-bold uppercase tracking-tight">Streak</span>
-                <span id="streakDisplay" class="bg-[#102132] text-white px-3 py-0.5 rounded-full text-xs font-bold">0 Days</span>
+        <div class="mt-5 flex items-center justify-between">
+            <div class="flex items-center bg-gray-100 rounded-full px-3 py-1.5 space-x-2">
+                <span class="text-[9px] text-gray-500 font-bold uppercase tracking-widest">Streak</span>
+                <span id="streakDisplay" class="text-[12px] font-black text-[#102132]">0 Days</span>
             </div>
-            <span id="currentDate" class="text-[10px] font-bold text-gray-400 uppercase"></span>
+            <span id="currentDate" class="text-[10px] font-bold text-gray-400 uppercase tracking-widest"></span>
         </div>
     </header>
 
-    <main class="mt-6 px-5 space-y-6">
+    <main class="mt-8 px-6 space-y-8">
 
-        <!-- The Transition: 6:15 PM Bridge -->
+        <!-- Focus Action: The Bridge -->
         <section id="bridgeSection">
-            <h2 class="text-[11px] font-semibold text-gray-400 uppercase tracking-widest mb-2 ml-1">The 6:15 PM Bridge</h2>
-            <div class="bg-white rounded-[24px] p-5 shadow-sm border border-gray-100">
-                <div class="flex items-center space-x-3 mb-5">
-                    <div id="statusIcon" class="w-10 h-10 bg-slate-100 rounded-2xl flex items-center justify-center text-xl shadow-inner">🚀</div>
+            <h2 class="text-[11px] font-bold text-gray-400 uppercase tracking-[0.2em] mb-3 ml-1">Daily Commitment</h2>
+            <div class="bg-white rounded-[28px] p-6 shadow-sm border border-gray-100">
+                <div class="flex items-center space-x-4 mb-6">
+                    <div id="statusIcon" class="w-12 h-12 bg-gray-50 rounded-2xl flex items-center justify-center text-2xl shadow-inner border border-gray-100">🚀</div>
                     <div>
-                        <h3 id="statusHeading" class="font-bold text-base leading-tight">Ready to Move?</h3>
-                        <p id="statusSubheading" class="text-[11px] text-gray-500">Go straight to the gym after 6 PM.</p>
+                        <h3 id="statusHeading" class="font-bold text-lg leading-tight tracking-tight">Lets go</h3>
+                        <p id="statusSubheading" class="text-[12px] text-gray-500">Go straight to the gym after 6 PM.</p>
                     </div>
                 </div>
                 
                 <div class="grid grid-cols-1 gap-3">
-                    <button onclick="logActivity('Gym')" class="w-full bg-[#102132] text-white py-4 rounded-2xl font-bold active:scale-[0.98] transition-all flex justify-between px-6 items-center shadow-lg shadow-blue-900/10">
-                        <span>Log Workout</span>
+                    <button id="gymBtn" onclick="logActivity('Gym')" class="w-full bg-[#102132] text-white py-4.5 rounded-[18px] font-bold active:scale-[0.97] transition-all flex justify-between px-6 items-center shadow-lg shadow-blue-900/10">
+                        <span id="gymLabel">Log Workout</span>
                         <span class="text-[9px] opacity-40 font-black uppercase tracking-widest">M · Th · F</span>
                     </button>
-                    <button onclick="logActivity('Walk')" class="w-full bg-white text-[#102132] py-4 rounded-2xl font-bold active:bg-gray-50 transition-colors border border-gray-200 flex justify-between px-6 items-center">
-                        <span>Log Active Rest</span>
+                    <button id="walkBtn" onclick="logActivity('Walk')" class="w-full bg-white text-[#102132] py-4.5 rounded-[18px] font-bold active:bg-gray-50 transition-colors border border-gray-200 flex justify-between px-6 items-center">
+                        <span id="walkLabel">Log Active Rest</span>
                         <span class="text-[9px] text-gray-400 font-black uppercase tracking-widest">T · Sat</span>
                     </button>
                 </div>
-                <p id="feedback" class="text-center mt-4 text-[11px] font-bold text-[#102132] hidden">Session Recorded</p>
+                <p id="feedback" class="text-center mt-4 text-[11px] font-bold text-[#102132] opacity-0 transition-opacity">Session Recorded</p>
             </div>
         </section>
 
-        <!-- Nutrition: Target Tracking -->
+        <!-- Nutrition: Tactical Targets -->
         <section>
-            <h2 class="text-[11px] font-semibold text-gray-400 uppercase tracking-widest mb-2 ml-1">Nutrition Strategy</h2>
-            <div class="bg-white rounded-[24px] overflow-hidden shadow-sm border border-gray-100 divide-y divide-gray-50">
-                <div class="flex items-center justify-between p-4">
+            <h2 class="text-[11px] font-bold text-gray-400 uppercase tracking-[0.2em] mb-3 ml-1">Nutrition Strategy</h2>
+            <div class="bg-white rounded-[28px] overflow-hidden shadow-sm border border-gray-100 divide-y divide-gray-50">
+                <div class="flex items-center justify-between p-5 active:bg-gray-50 transition-colors" onclick="toggleCheck('checkProtein')">
                     <div class="flex flex-col">
-                        <span class="font-bold text-sm tracking-tight">High Protein Lunch</span>
-                        <span class="text-[10px] text-gray-400 uppercase font-bold tracking-tighter">Front-load protein</span>
+                        <span class="font-bold text-[15px] tracking-tight">High Protein Lunch</span>
+                        <span class="text-[10px] text-gray-400 uppercase font-bold tracking-widest mt-0.5">Front-load protein</span>
                     </div>
-                    <input type="checkbox" id="checkProtein" onchange="updateProgress()" class="apple-checkbox daily-task">
+                    <input type="checkbox" id="checkProtein" onchange="handleTaskChange()" class="apple-checkbox daily-task" onclick="event.stopPropagation()">
                 </div>
-                <div class="flex items-center justify-between p-4">
+                <div class="flex items-center justify-between p-5 active:bg-gray-50 transition-colors" onclick="toggleCheck('checkSnack')">
                     <div class="flex flex-col">
-                        <span class="font-bold text-sm tracking-tight">5 PM Bridge Snack</span>
-                        <span class="text-[10px] text-gray-400 uppercase font-bold tracking-tighter">Crucial energy</span>
+                        <span class="font-bold text-[15px] tracking-tight">5 PM Bridge Snack</span>
+                        <span class="text-[10px] text-gray-400 uppercase font-bold tracking-widest mt-0.5">Critical energy</span>
                     </div>
-                    <input type="checkbox" id="checkSnack" onchange="updateProgress()" class="apple-checkbox daily-task">
+                    <input type="checkbox" id="checkSnack" onchange="handleTaskChange()" class="apple-checkbox daily-task" onclick="event.stopPropagation()">
                 </div>
-                <div class="flex items-center justify-between p-4">
+                <div class="flex items-center justify-between p-5 active:bg-gray-50 transition-colors" onclick="toggleCheck('checkDeficit')">
                     <div class="flex flex-col">
-                        <span class="font-bold text-sm tracking-tight">Caloric Deficit</span>
-                        <span class="text-[10px] text-gray-400 uppercase font-bold tracking-tighter">Big dinner limited?</span>
+                        <span class="font-bold text-[15px] tracking-tight text-[#102132]">Caloric Deficit</span>
+                        <span class="text-[10px] text-gray-400 uppercase font-bold tracking-widest mt-0.5">Control the Dinner</span>
                     </div>
-                    <input type="checkbox" id="checkDeficit" onchange="updateProgress()" class="apple-checkbox daily-task">
+                    <input type="checkbox" id="checkDeficit" onchange="handleTaskChange()" class="apple-checkbox daily-task" onclick="event.stopPropagation()">
                 </div>
-                <div class="flex items-center justify-between p-4 bg-slate-50/50">
+                <div class="flex items-center justify-between p-5 bg-slate-50/40" onclick="toggleCheck('checkBag')">
                     <div class="flex flex-col">
-                        <span class="font-bold text-sm tracking-tight text-gray-400">Gym Bag Packed</span>
-                        <span class="text-[10px] text-gray-400 uppercase font-bold tracking-tighter">Prepare for tomorrow</span>
+                        <span class="font-bold text-[15px] tracking-tight text-gray-400">Gym Bag Packed</span>
+                        <span class="text-[10px] text-gray-400 uppercase font-bold tracking-widest mt-0.5">Prepare for tomorrow</span>
                     </div>
-                    <input type="checkbox" id="checkBag" onchange="updateProgress()" class="apple-checkbox daily-task">
+                    <input type="checkbox" id="checkBag" onchange="handleTaskChange()" class="apple-checkbox daily-task" onclick="event.stopPropagation()">
                 </div>
             </div>
         </section>
 
         <!-- Weekly Reference -->
         <section>
-            <h2 class="text-[11px] font-semibold text-gray-400 uppercase tracking-widest mb-2 ml-1">Weekly Blueprint</h2>
-            <div class="bg-white rounded-[24px] overflow-hidden shadow-sm border border-gray-100">
-                <div id="calendarContent"></div>
-            </div>
+            <h2 class="text-[11px] font-bold text-gray-400 uppercase tracking-[0.2em] mb-3 ml-1">Weekly Blueprint</h2>
+            <div id="calendarContent" class="bg-white rounded-[28px] overflow-hidden shadow-sm border border-gray-100 divide-y divide-gray-50"></div>
         </section>
 
-        <div class="flex flex-col items-center pt-4 pb-8 space-y-4">
-            <button onclick="resetAll()" class="text-gray-300 text-[10px] font-bold uppercase tracking-widest border-b border-gray-200 pb-0.5 active:text-red-400 transition-colors">
+        <div class="flex flex-col items-center pt-8 pb-12">
+            <button onclick="resetAll()" class="text-gray-300 text-[10px] font-bold uppercase tracking-[0.25em] border-b border-gray-200 pb-1 active:text-red-400 active:border-red-400 transition-all">
                 Reset All Progress
             </button>
         </div>
@@ -166,27 +186,37 @@
             initApp();
             renderCalendar();
             updateContext();
-            setInterval(updateContext, 60000); // Check every minute
+            setInterval(updateContext, 60000);
         });
+
+        function playSfx(id) {
+            const sound = document.getElementById(id);
+            sound.currentTime = 0;
+            sound.play().catch(() => {}); // Catch if browser blocks autoplay
+        }
 
         function initApp() {
             const streak = localStorage.getItem('streak') || 0;
             document.getElementById('streakDisplay').innerText = streak + ' Days';
             
-            // Load saved task states
             const tasks = ['protein', 'snack', 'deficit', 'bag'];
             tasks.forEach(task => {
                 const element = document.getElementById('check' + task.charAt(0).toUpperCase() + task.slice(1));
                 if (element) element.checked = localStorage.getItem(task) === 'true';
             });
 
+            // Restore workout status for the day
+            const todayStr = new Date().toDateString();
+            if (localStorage.getItem('lastWorkoutDate') === todayStr) {
+                markWorkoutDone(localStorage.getItem('lastWorkoutType'));
+            }
+
             document.getElementById('currentDate').innerText = new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
-            updateProgress();
+            updateProgress(false);
         }
 
         function updateContext() {
-            const now = new Date();
-            const hour = now.getHours();
+            const hour = new Date().getHours();
             const greeting = document.getElementById('timeGreeting');
             const title = document.getElementById('mainTitle');
             const statusH = document.getElementById('statusHeading');
@@ -208,7 +238,7 @@
             } else {
                 greeting.innerText = "Current Focus";
                 title.innerText = "So you came back for more";
-                statusH.innerText = "Ready to Move?";
+                statusH.innerText = "Lets go";
                 statusS.innerText = "Immediate transition. No home stops.";
                 icon.innerText = "🚀";
             }
@@ -216,59 +246,106 @@
 
         function renderCalendar() {
             const container = document.getElementById('calendarContent');
-            const currentDayIndex = (new Date().getDay() + 6) % 7; // Adjust to Monday start
+            const currentDayIndex = (new Date().getDay() + 6) % 7; 
 
             container.innerHTML = days.map((d, index) => `
-                <div class="flex items-center p-4 ${index < days.length - 1 ? 'border-b border-gray-50' : ''} ${index === currentDayIndex ? 'bg-blue-50/30' : ''}">
-                    <div class="w-12 flex flex-col items-center border-r border-gray-100 mr-4">
-                        <span class="text-[10px] ${index === 0 ? 'text-red-500' : index === 2 ? 'text-blue-500' : 'text-gray-400'} font-bold uppercase tracking-tighter">${d.day}</span>
+                <div class="flex items-center p-5 ${index === currentDayIndex ? 'bg-blue-50/20 today-highlight' : ''}">
+                    <div class="w-14 flex flex-col items-center border-r border-gray-100 mr-5">
+                        <span class="text-[10px] ${index === 0 ? 'text-red-500' : index === 2 ? 'text-blue-500' : 'text-gray-400'} font-bold uppercase tracking-widest">${d.day}</span>
                     </div>
                     <div class="flex-1 flex items-center">
-                        <div class="w-2.5 h-2.5 rounded-full mr-3 shadow-sm" style="background-color: ${d.color}"></div>
-                        <span class="text-sm font-semibold ${d.italic ? 'italic text-gray-400 font-medium' : 'text-gray-700'}">${d.activity}</span>
+                        <div class="w-2.5 h-2.5 rounded-full mr-4 shadow-sm" style="background-color: ${d.color}"></div>
+                        <span class="text-[14px] font-bold ${d.italic ? 'italic text-gray-400 font-medium' : 'text-[#102132]'} tracking-tight">${d.activity}</span>
                     </div>
-                    ${index === currentDayIndex ? '<span class="text-[8px] font-bold text-blue-500 uppercase tracking-widest">Today</span>' : ''}
+                    ${index === currentDayIndex ? '<span class="text-[9px] font-black text-blue-600 uppercase tracking-widest">Today</span>' : ''}
                 </div>
             `).join('');
         }
 
-        function updateProgress() {
-            const totalTasks = document.querySelectorAll('.daily-task').length;
-            const completedTasks = document.querySelectorAll('.daily-task:checked').length;
-            const percentage = Math.round((completedTasks / totalTasks) * 100);
+        function toggleCheck(id) {
+            const cb = document.getElementById(id);
+            cb.checked = !cb.checked;
+            handleTaskChange();
+        }
+
+        function handleTaskChange() {
+            playSfx('clickSound');
+            updateProgress(true);
+        }
+
+        function updateProgress(withSfx) {
+            const dailyTasks = document.querySelectorAll('.daily-task');
+            const totalTasks = dailyTasks.length + 1; // +1 for the workout
             
-            // Update Circle
+            let completedCount = document.querySelectorAll('.daily-task:checked').length;
+            if (localStorage.getItem('lastWorkoutDate') === new Date().toDateString()) {
+                completedCount++;
+            }
+
+            const percentage = Math.round((completedCount / totalTasks) * 100);
+            
             const circle = document.getElementById('progressCircle');
-            const radius = circle.r.baseVal.value;
-            const circumference = radius * 2 * Math.PI;
-            const offset = circumference - (percentage / 100) * circumference;
-            circle.style.strokeDashoffset = offset;
-            
+            const circumference = 26 * 2 * Math.PI;
+            circle.style.strokeDashoffset = circumference - (percentage / 100) * circumference;
             document.getElementById('progressText').innerText = percentage + '%';
 
-            // Save state
+            const scoreLabel = document.getElementById('scoreLabel');
+            if (percentage === 100) {
+                scoreLabel.innerText = "Perfect Day Accomplished! 🏆";
+                if(withSfx) playSfx('completeSound');
+            } else if (percentage > 50) {
+                scoreLabel.innerText = "You're crushing it today.";
+            } else if (percentage > 0) {
+                scoreLabel.innerText = "Momentum is building.";
+            } else {
+                scoreLabel.innerText = "Waiting for the first win...";
+            }
+
+            // Persistence
             localStorage.setItem('protein', document.getElementById('checkProtein').checked);
             localStorage.setItem('snack', document.getElementById('checkSnack').checked);
             localStorage.setItem('deficit', document.getElementById('checkDeficit').checked);
             localStorage.setItem('bag', document.getElementById('checkBag').checked);
         }
 
+        function markWorkoutDone(type) {
+            const gymBtn = document.getElementById('gymBtn');
+            const walkBtn = document.getElementById('walkBtn');
+            const feedback = document.getElementById('feedback');
+
+            if (type === 'Gym') {
+                gymBtn.innerHTML = '<span>Workout Logged ✓</span><span class="text-[10px]">🔥</span>';
+                gymBtn.classList.replace('bg-[#102132]', 'bg-emerald-600');
+            } else {
+                walkBtn.innerHTML = '<span>Active Rest Logged ✓</span><span class="text-[10px]">🌿</span>';
+                walkBtn.classList.replace('bg-white', 'bg-emerald-50');
+                walkBtn.classList.add('border-emerald-200');
+            }
+        }
+
         function logActivity(type) {
+            const todayStr = new Date().toDateString();
+            if (localStorage.getItem('lastWorkoutDate') === todayStr) return;
+
+            localStorage.setItem('lastWorkoutDate', todayStr);
+            localStorage.setItem('lastWorkoutType', type);
+
             let streak = parseInt(localStorage.getItem('streak') || 0);
             streak++;
             localStorage.setItem('streak', streak);
             document.getElementById('streakDisplay').innerText = streak + ' Days';
             
-            const feedback = document.getElementById('feedback');
-            feedback.innerText = type + " Logged 🔥";
-            feedback.classList.remove('hidden');
+            markWorkoutDone(type);
+            playSfx('completeSound');
             
-            // Add slight vibration/haptic feel if on mobile
-            if (window.navigator && window.navigator.vibrate) {
-                window.navigator.vibrate(10);
-            }
+            const fb = document.getElementById('feedback');
+            fb.innerText = type + " Logged 🔥";
+            fb.classList.replace('opacity-0', 'opacity-100');
             
-            setTimeout(() => feedback.classList.add('hidden'), 2500);
+            if (window.navigator && window.navigator.vibrate) window.navigator.vibrate([10, 30, 10]);
+            
+            updateProgress(true);
+            setTimeout(() => fb.classList.replace('opacity-100', 'opacity-0'), 3000);
         }
 
         function resetAll() {
